@@ -1,0 +1,551 @@
+
+
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { 
+  ArrowRight, 
+  ChevronLeft, 
+  ChevronRight, 
+  Star,
+  Award,
+  Users,
+  Clock,
+  Shield,
+  TrendingUp
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { User } from '@/entities/User';
+import { motion } from 'framer-motion';
+
+export default function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showCompanyInfo, setShowCompanyInfo] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const currentUser = await User.me();
+        setUser(currentUser);
+        
+        // Only redirect if user explicitly chooses provider role AND has completed onboarding
+        // This allows the Home page to be publicly accessible
+        // Removed automatic redirection for providers, as per the new requirement
+        // The Home page should be accessible to all users, regardless of their logged-in status or role.
+        // Providers can still view the public home page if they want.
+        // If there's a specific need to redirect providers who are already onboarded,
+        // it should be handled in a separate route or a more targeted component.
+      } catch (e) {
+        // No authentication required for home page - it's public
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, [navigate]);
+
+  const serviceSlides = [
+    {
+      title: "Brake & Suspension",
+      image: "https://images.unsplash.com/photo-1729843606560-e41b0be7fc7c?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=bengkel-mobil-matic-bandung-NiiGc13cZ7A-unsplash.jpg",
+      category: "brake-suspension"
+    },
+    {
+      title: "Air Conditioning",
+      image: "https://images.unsplash.com/photo-1587121892719-1711ec9cc798?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=yoonbae-cho-5CW2ZUP9Cu0-unsplash.jpg",
+      category: "air-conditioning"
+    },
+    {
+      title: "Tires & Wheels",
+      image: "https://images.unsplash.com/photo-1580403596202-f8dac5d780c6?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=tekton-UuO9Jdu2d7E-unsplash.jpg",
+      category: "tires-wheels"
+    },
+    {
+      title: "Body & Cosmetic",
+      image: "https://images.unsplash.com/photo-1698358894561-551687f8e029?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=agamveer-singh-IoEytc7wTXY-unsplash.jpg",
+      category: "body-cosmetic"
+    },
+    {
+      title: "Exhaust & Emission",
+      image: "https://images.unsplash.com/photo-1556783151-c6d5e7d296bb?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=matt-boitor-I74mkR_3OP0-unsplash.jpg",
+      category: "exhaust-emission"
+    },
+    {
+      title: "Emergency Services",
+      image: "https://images.unsplash.com/photo-1643934398344-d4ed2add8a27?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=ellephant-lUtncSVWkkw-unsplash.jpg",
+      category: "emergency-services"
+    }
+  ];
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % serviceSlides.length);
+  }, [serviceSlides.length]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + serviceSlides.length) % serviceSlides.length);
+  }, [serviceSlides.length]);
+
+  // Auto-advance slides
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
+
+  // Show loading only briefly, then show public content regardless of auth status
+  if (isLoading) {
+    return (
+      <div className="bg-black text-white min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-red-600 to-red-700 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <span className="text-white font-bold text-2xl">MF</span>
+          </div>
+          <div className="animate-pulse text-gray-400">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-black text-white">
+      {/* Hero Section */}
+      <section className="relative h-screen overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1606577924006-27d39b132ae2?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=c-joyful-heFTscwGDCA-unsplash.jpg')`
+          }}
+        >
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+        
+        <div className="relative z-10 h-full flex items-center">
+          <div className="max-w-7xl mx-auto px-6 w-full">
+            <div className="max-w-3xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tight">
+                  MOTORSURE
+                  <span className="block text-red-600">FIX</span>
+                </h1>
+                <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+                  Premium automotive care where precision meets passion. 
+                  Your vehicle deserves nothing less than excellence.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link to={createPageUrl(user ? "Services" : "Auth")}>
+                    <Button 
+                      size="lg"
+                      className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg font-medium"
+                    >
+                      {user ? 'Browse Services' : 'Get Started'}
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </Link>
+                  
+                  <Dialog open={showCompanyInfo} onOpenChange={setShowCompanyInfo}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        className="border-2 border-white hover:bg-white hover:text-black text-white px-8 py-4 text-lg font-medium"
+                      >
+                        Learn More
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-black text-white border-gray-800">
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold text-red-600">About MOTORSURE FIX</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-6 text-gray-300 leading-relaxed">
+                        <p className="text-lg">
+                          Welcome to MOTORSURE FIX, where automotive excellence meets uncompromising service standards. 
+                          For over two decades, we have been the trusted choice for discerning vehicle owners who demand 
+                          nothing but the finest care for their automotive investments.
+                        </p>
+                        
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <h3 className="text-xl font-semibold text-white mb-3">Our Mission</h3>
+                            <p>
+                              To revolutionize automotive care by connecting customers with trusted service providers, 
+                              ensuring every vehicle receives professional, reliable, and efficient service.
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h3 className="text-xl font-semibold text-white mb-3">Why Choose Us</h3>
+                            <ul className="space-y-2">
+                              <li className="flex items-center gap-2">
+                                <Shield className="w-4 h-4 text-red-500" />
+                                <span>Verified service providers</span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <Star className="w-4 h-4 text-red-500" />
+                                <span>Quality guaranteed</span>
+                              </li>
+                              <li className="flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-red-500" />
+                                <span>24/7 support</span>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        
+                        <p className="text-lg font-medium text-red-600">
+                          Experience the MOTORSURE FIX difference—where your car's care is our craft, and excellence is our standard.
+                        </p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition for New Users */}
+      {!user && (
+        <section className="py-16 bg-gray-900">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">Join MOTORSURE FIX Today</h2>
+              <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                Whether you're looking for reliable automotive services or want to grow your business, 
+                we have everything you need.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <Card className="bg-black border-gray-800 hover:border-blue-600 transition-all duration-300 p-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">For Customers</h3>
+                  <p className="text-gray-400 mb-6">
+                    Find trusted automotive services, compare prices, and book with confidence.
+                  </p>
+                  <Link to={createPageUrl("Auth")}>
+                    <Button className="bg-blue-600 hover:bg-blue-700 w-full">
+                      Start Shopping <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+              
+              <Card className="bg-black border-gray-800 hover:border-red-600 transition-all duration-300 p-6">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">For Providers</h3>
+                  <p className="text-gray-400 mb-6">
+                    List your services, manage bookings, and grow your automotive business.
+                  </p>
+                  <Link to={createPageUrl("Auth")}>
+                    <Button className="bg-red-600 hover:bg-red-700 w-full">
+                      Start Providing <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Service Categories Slider */}
+      <section className="py-24 bg-gray-900">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">COMPLETE AUTO CARE</h2>
+            <p className="text-gray-400 text-lg">Comprehensive services for every automotive need</p>
+          </div>
+
+          <div className="relative">
+            <div className="overflow-hidden rounded-xl">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {serviceSlides.map((slide, index) => (
+                  <div key={index} className="w-full flex-shrink-0">
+                    <div className="relative h-96 mx-4 rounded-lg overflow-hidden group">
+                      <img 
+                        src={slide.image}
+                        alt={slide.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                      <div className="absolute bottom-8 left-8 right-8">
+                        <h3 className="text-3xl font-bold text-white mb-4">{slide.title}</h3>
+                        <Link to={createPageUrl(`Services?category=${slide.category}`)}>
+                          <Button className="bg-white text-black hover:bg-gray-200 transition-colors duration-300">
+                            VIEW SERVICES <ArrowRight className="ml-2 w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 border-gray-600 text-white hover:bg-black/70 z-10"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 border-gray-600 text-white hover:bg-black/70 z-10"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </Button>
+          </div>
+
+          <div className="flex justify-center mt-8 space-x-2">
+            {serviceSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                  currentSlide === index ? 'bg-red-600' : 'bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Hot Services Section */}
+      <section className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold mb-4">HOT SERVICES</h2>
+            <p className="text-gray-400 text-lg">Premium automotive solutions tailored to your needs</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-500">
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1686082307524-c89fb0bfadde?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=igor-constantino-aXxu0nVMGmk-unsplash.jpg"
+                  alt="Routine Maintenance"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              </div>
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-white mb-4">Routine Maintenance</h3>
+                <p className="text-gray-400 mb-6">
+                  Keep your vehicle running at peak performance with our comprehensive maintenance services. 
+                  From oil changes to multi-point inspections, we ensure your car stays reliable and efficient.
+                </p>
+                <Link to={createPageUrl("Services?category=routine-maintenance")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white">
+                    Explore Services <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-500">
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1633990308758-b26aada5804e?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=mike-newbry-7LsSwWhBRaQ-unsplash.jpg"
+                  alt="Inspection and Diagnostics"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              </div>
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-white mb-4">Inspection & Diagnostics</h3>
+                <p className="text-gray-400 mb-6">
+                  Advanced diagnostic technology meets expert analysis. We identify issues before they become 
+                  problems, saving you time and money with precise, thorough inspections.
+                </p>
+                <Link to={createPageUrl("Services?category=inspection-diagnostics")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white">
+                    Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-500">
+              <div className="relative h-64 overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1725289339928-06ee31684df5?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=luca-hooijer-u3RhNe3QJeM-unsplash.jpg"
+                  alt="Engine Services"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+              </div>
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold text-white mb-4">Engine Services</h3>
+                <p className="text-gray-400 mb-6">
+                  Complete engine care from routine tune-ups to major overhauls. Our certified technicians 
+                  deliver precision service that keeps your engine running smoothly for years to come.
+                </p>
+                <Link to={createPageUrl("Services?category=engine-services")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white">
+                    View Details <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Care Message Section */}
+      <section className="py-20 bg-gray-900">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-6xl font-bold leading-tight">
+            Your car deserves more than just a fix—
+            <span className="text-red-600">it deserves care</span>
+          </h2>
+        </div>
+      </section>
+
+      {/* Discover Section */}
+      <section className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">DISCOVER MORE</h2>
+            <p className="text-gray-400 text-lg">Everything you need for your automotive journey</p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-300">
+              <div className="relative h-48">
+                <img 
+                  src="https://images.unsplash.com/photo-1651275265408-9a4d8c820b87?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=futc-GWFZU-1Wj4w-unsplash.jpg"
+                  alt="Auto Shop"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40"></div>
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-white mb-3">Auto Shop</h3>
+                <p className="text-gray-400 mb-4">
+                  Premium automotive parts and accessories. Quality components for DIY enthusiasts and professional mechanics.
+                </p>
+                <Link to={createPageUrl("AutoShop")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
+                    Shop Now
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-300">
+              <div className="relative h-48">
+                <img 
+                  src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=naassom-azevedo-Q_Sei-TqSlc-unsplash.jpg"
+                  alt="Customer Stories"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40"></div>
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-white mb-3">Customer Stories</h3>
+                <p className="text-gray-400 mb-4">
+                  Real experiences from satisfied customers. Discover fascinating automotive facts and success stories.
+                </p>
+                <Link to={createPageUrl("Stories")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
+                    Read Stories
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900 border-gray-800 overflow-hidden group hover:border-red-600 transition-all duration-300">
+              <div className="relative h-48">
+                <img 
+                  src="https://images.unsplash.com/photo-1730453075684-2ad6232ab451?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=maxx-sas-Wi0UCLsvShA-unsplash.jpg"
+                  alt="Car Care Tips"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/40"></div>
+              </div>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold text-white mb-3">Car Care Tips</h3>
+                <p className="text-gray-400 mb-4">
+                  Expert advice and educational content. Learn how to maintain your vehicle and extend its lifespan.
+                </p>
+                <Link to={createPageUrl("CarCareTips")}>
+                  <Button className="bg-red-600 hover:bg-red-700 text-white w-full">
+                    Learn More
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-red-600">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="flex justify-center mb-4">
+                <Award className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">25+</h3>
+              <p className="text-red-100">Years Experience</p>
+            </div>
+            <div>
+              <div className="flex justify-center mb-4">
+                <Users className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">15,000+</h3>
+              <p className="text-red-100">Happy Customers</p>
+            </div>
+            <div>
+              <div className="flex justify-center mb-4">
+                <Star className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">4.9</h3>
+              <p className="text-red-100">Average Rating</p>
+            </div>
+            <div>
+              <div className="flex justify-center mb-4">
+                <Clock className="w-12 h-12 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-2">24/7</h3>
+              <p className="text-red-100">Emergency Service</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
